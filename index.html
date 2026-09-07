@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IG 文案產生器</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const TONES = ["親切", "正式", "中性告知", "積極跟進", "簡潔"];
+    const LENGTHS = ["3 句", "5 句", "8 句"];
+    const SAMPLE_HASHTAGS = "#HapeHongKong #Eurekakids #玩具 #親子 #兒童玩具 #香港媽媽";
+
+    function App() {
+      const [url, setUrl] = useState("");
+      const [productName, setProductName] = useState("");
+      const [description, setDescription] = useState("");
+      const [tone, setTone] = useState("親切");
+      const [length, setLength] = useState("5 句");
+      const [output, setOutput] = useState("");
+      const [loading, setLoading] = useState(false);
+      const [fetching, setFetching] = useState(false);
+      const [copied, setCopied] = useState(false);
+      const [fetchError, setFetchError] = useState("");
+
+      const handleFetch = async () => {
+        if (!url) return;
+        setFetching(true);
+        setFetchError("");
+        try {
+          const res = await fetch(`/api/fetch-product?url=${encodeURIComponent(url)}`);
+          const data = await res.json();
+          if (data.error) {
+            setFetchError("抓取失敗，請手動填寫");
+          } else {
+            if (data.name) setProductName(data.name);
+            if (data.description) setDescription(data.description);
+          }
+        } catch (e) {
+          setFetchError("抓取失敗，請手動填寫");
+        }
+        setFetching(false);
+      };
+
+      const handleGenerate = () => {
+        if (!productName && !description) return;
+        setLoading(true);
+        setTimeout(() => {
+          setOutput(
+            `✨ 讓小朋友愛不釋手的 ${productName || "新品"} 來啦！\n\n每一個細節都為小手設計，安全耐用、顏色鮮豔，讓寶貝在遊戲中快樂成長 🌟\n\n送禮自用兩相宜，絕對係家長的最佳之選 💛\n\n立即了解更多 👉 連結在 Bio\n\n${SAMPLE_HASHTAGS}`
+          );
+          setLoading(false);
+        }, 1200);
+      };
+
+      const handleCopy = () => {
+        if (!output) return;
+        navigator.clipboard.writeText(output);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      };
+
+      const handleClear = () => {
+        setUrl("");
+        setProductName("");
+        setDescription("");
+        setOutput("");
+        setFetchError("");
+      };
+
+      return (
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+          <div className="bg-white border-b border-gray-200 px-6 py-4">
+            <h1 className="text-xl font-bold text-gray-800">IG 文案產生器</h1>
+            <p className="text-sm text-gray-400 mt-0.5">貼入產品連結或手動輸入，一鍵生成 IG 文案</p>
+          </div>
+
+          <div className="flex-1 flex flex-col md:flex-row">
+            <div className="w-full md:w-1/2 p-6 flex flex-col gap-5">
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">產品連結（URL）</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://eurekakids.com.hk/products/..."
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  />
+                  <button
+                    onClick={handleFetch}
+                    disabled={fetching || !url}
+                    className="bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-200 text-white text-sm px-4 py-2 rounded-lg transition"
+                  >
+                    {fetching ? "抓取中…" : "抓取"}
+                  </button>
+                </div>
+                {fetchError && <p className="text-xs text-red-400 mt-1">{fetchError}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">產品名稱</label>
+                <input
+                  type="text"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder="例：木製彩色疊疊樂"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">產品描述</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="簡單描述產品特點、材質、適合年齡等…"
+                  rows={4}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+                />
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-600 mb-1">語氣</label>
+                  <select
+                    value={tone}
+                    onChange={(e) => setTone(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  >
+                    {TONES.map((t) => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-600 mb-1">長度</label>
+                  <select
+                    value={length}
+                    onChange={(e) => setLength(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  >
+                    {LENGTHS.map((l) => <option key={l}>{l}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleGenerate}
+                  disabled={loading || (!productName && !description)}
+                  className="flex-1 bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-200 text-white font-medium py-2.5 rounded-lg transition text-sm"
+                >
+                  {loading ? "生成中…" : "✦ 生成文案"}
+                </button>
+                <button
+                  onClick={handleClear}
+                  className="px-4 py-2.5 border border-gray-200 hover:bg-gray-100 text-gray-500 rounded-lg text-sm transition"
+                >
+                  一鍵清除
+                </button>
+              </div>
+            </div>
+
+            <div className="hidden md:block w-px bg-gray-100" />
+
+            <div className="w-full md:w-1/2 p-6 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-600">生成文案</label>
+                {output && (
+                  <button
+                    onClick={handleCopy}
+                    className="text-xs text-indigo-500 hover:text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full transition"
+                  >
+                    {copied ? "已複製 ✓" : "複製文案"}
+                  </button>
+                )}
+              </div>
+              <textarea
+                value={output}
+                onChange={(e) => setOutput(e.target.value)}
+                placeholder="文案會在這裡出現，你可以直接在這裡修改…"
+                rows={14}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none bg-white"
+              />
+              {output && (
+                <p className="text-xs text-gray-400 text-right">{output.length} 字元</p>
+              )}
+            </div>
+          </div>
+
+          <div className="text-center py-4 text-xs text-gray-300 border-t border-gray-100">
+            created by Tabris Yuen @2026
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
