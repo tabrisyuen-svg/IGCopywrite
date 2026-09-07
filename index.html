@@ -1,208 +1,243 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IG 文案產生器</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>RicOutlet IG 文案生成器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f4f8; color: #333; min-height: 100vh; }
+    .container { max-width: 600px; margin: 0 auto; padding: 28px 16px; }
+    h1 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #111; }
+    .card { background: white; border-radius: 14px; padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    label { display: block; font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    input[type="text"] { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; outline: none; transition: border-color 0.2s; color: #333; }
+    input[type="text"]:focus { border-color: #6366f1; }
+    .format-group { display: flex; gap: 8px; }
+    .fmt-btn { flex: 1; padding: 11px 6px; border: 1.5px solid #e5e5e5; background: white; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.18s; color: #555; }
+    .fmt-btn.active { border-color: #6366f1; background: #6366f1; color: white; }
+    .fmt-btn:hover:not(.active) { border-color: #6366f1; color: #6366f1; }
+    .gen-btn { width: 100%; padding: 13px; background: #6366f1; color: white; border: none; border-radius: 9px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .gen-btn:hover { background: #4f46e5; }
+    .gen-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
+    .status { font-size: 13px; text-align: center; min-height: 18px; margin-top: 10px; color: #888; }
+    .status.error { color: #ef4444; }
+    .status.success { color: #10b981; }
+    .preview-box { margin-top: 12px; background: #f8f8fc; border-radius: 8px; padding: 10px 13px; font-size: 13px; color: #555; display: none; }
+    .preview-box.show { display: block; }
+    .preview-box strong { color: #333; }
+    textarea { width: 100%; min-height: 220px; padding: 13px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; line-height: 1.75; resize: vertical; font-family: inherit; outline: none; color: #333; }
+    .copy-btn { width: 100%; padding: 11px; background: #10b981; color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
+    .copy-btn:hover { background: #059669; }
+    #outputCard { display: none; }
+  </style>
 </head>
-<body class="bg-gray-50">
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState } = React;
+<body>
+<div class="container">
+  <h1>🛍️ RicOutlet IG 文案生成器</h1>
 
-    const TONES = ["親切", "正式", "中性告知", "積極跟進", "簡潔"];
-    const LENGTHS = ["3 句", "5 句", "8 句"];
-    const SAMPLE_HASHTAGS = "#HapeHongKong #Eurekakids #玩具 #親子 #兒童玩具 #香港媽媽";
+  <div class="card">
+    <label>產品連結</label>
+    <input type="text" id="urlInput" placeholder="https://www.ricoutlet.com.hk/products/..." />
+    <div class="preview-box" id="previewBox"></div>
+  </div>
 
-    function App() {
-      const [url, setUrl] = useState("");
-      const [productName, setProductName] = useState("");
-      const [description, setDescription] = useState("");
-      const [tone, setTone] = useState("親切");
-      const [length, setLength] = useState("5 句");
-      const [output, setOutput] = useState("");
-      const [loading, setLoading] = useState(false);
-      const [fetching, setFetching] = useState(false);
-      const [copied, setCopied] = useState(false);
-      const [fetchError, setFetchError] = useState("");
+  <div class="card">
+    <label>文案格式</label>
+    <div class="format-group">
+      <button class="fmt-btn active" data-f="A">A｜簡潔</button>
+      <button class="fmt-btn" data-f="B">B｜新上架</button>
+      <button class="fmt-btn" data-f="C">C｜優惠</button>
+    </div>
+  </div>
 
-      const handleFetch = async () => {
-        if (!url) return;
-        setFetching(true);
-        setFetchError("");
-        try {
-          const res = await fetch(`/api/fetch-product?url=${encodeURIComponent(url)}`);
-          const data = await res.json();
-          if (data.error) {
-            setFetchError("抓取失敗，請手動填寫");
-          } else {
-            if (data.name) setProductName(data.name);
-            if (data.description) setDescription(data.description);
-          }
-        } catch (e) {
-          setFetchError("抓取失敗，請手動填寫");
-        }
-        setFetching(false);
-      };
+  <div class="card">
+    <button class="gen-btn" id="genBtn">生成文案</button>
+    <div class="status" id="status"></div>
+  </div>
 
-      const handleGenerate = () => {
-        if (!productName && !description) return;
-        setLoading(true);
-        setTimeout(() => {
-          setOutput(
-            `✨ 讓小朋友愛不釋手的 ${productName || "新品"} 來啦！\n\n每一個細節都為小手設計，安全耐用、顏色鮮豔，讓寶貝在遊戲中快樂成長 🌟\n\n送禮自用兩相宜，絕對係家長的最佳之選 💛\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 ${url || ""}\n\n${SAMPLE_HASHTAGS}`
-          );
-          setLoading(false);
-        }, 1200);
-      };
+  <div class="card" id="outputCard">
+    <label>生成結果</label>
+    <textarea id="output" readonly></textarea>
+    <button class="copy-btn" id="copyBtn">📋 複製文案</button>
+  </div>
+</div>
 
-      const handleCopy = () => {
-        if (!output) return;
-        navigator.clipboard.writeText(output);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      };
+<script>
+// =============================================
+// 文案庫（後台用，前台不顯示）
+// =============================================
+const COPY_LIBRARY = [
+  { format:'A', title:'CUCU 音樂熊貓',
+    copy:`CUCU｜Cucu Hanging Musical Plush Toy Panda 音樂熊貓 🐼🎵\n\n採用可愛熊貓造型設計，結合柔和音樂功能，為寶寶提供安心陪伴與感官刺激。可懸掛於嬰兒床、推車或遊戲架上，透過拉動或觸碰啟動音樂，幫助寶寶建立因果關係理解，同時促進聽覺發展與專注力。\n\n售價 HK$139.00\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/cucu-panda\n\n#音樂玩具 #嬰幼兒玩具 #感官玩具 #安撫玩具 #親子互動 #早教啟蒙 #RicOutlet` },
+  { format:'C', title:'$399 精選福袋',
+    copy:`$399 精選福袋（原價$700）5 件帶走 🎁✨\nCOMBAT SHIP／Ocean Rescue／Collage Kit／WHO IS WHO／Push and Run Fox\n\n一次收齊 5 件人氣玩具，涵蓋桌遊、拼圖、幼兒推拉與藝術創作等多元玩法，兼顧想像力、手眼協調與精細動作發展。\n✅ 組合固定，不設自選｜門市與網店同步發售｜數量有限，售完即止\n\n售價 $399（原價 $700）\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/bundle-399\n\n#福袋 #限時優惠 #玩具優惠 #親子互動 #幼兒玩具 #RicOutlet` },
+  { format:'A', title:'Käthe Kruse 兔子安撫娃娃',
+    copy:`Käthe Kruse｜Bunny Pino Dangle Hase Pino 兔子安撫娃娃 35cm 🐰✨\n\n可愛兔子造型＋長條柔軟身形，特別適合寶寶抓握與擁抱；可作為吊掛裝飾或安撫玩偶使用，陪伴寶寶建立安全感與情緒安定。\n\n售價 HK$449.00\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/kathe-kruse-bunny-pino-dangle-hase-pino-35cm\n\n#安撫玩具 #毛絨公仔 #嬰幼兒玩具 #德國玩具 #送禮之選 #RicOutlet` },
+  { format:'B', title:'Tickled Pink Girls Vanity 女孩梳妝台套裝',
+    copy:`新上架｜Tickled Pink Girls Vanity 女孩梳妝台套裝 💄\n\n扮家家酒升級，專屬小公主的梳妝時刻\n\n✅ 安全鏡面＋圓角設計，放心照鏡玩造型\n✅ 收納抽屜／層架，髮飾與配件唔再東掉西漏\n✅ 附玩具梳子與飾品，道具完整更投入\n✅ 穩固桌椅組，居家角落一秒變角色扮演區\n\n適齡：3Y+｜培養自我照護 routine、想像力與精細動作\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/hapee8350\n\n#梳妝台玩具 #扮家家酒 #角色扮演 #女孩玩具 #親子互動 #精細動作 #RicOutlet` },
+  { format:'B', title:'Four Fundamentals 四款基本感官玩具',
+    copy:`新上架｜Four Fundamentals 四款基本感官玩具 🌈\n\n一次入手視覺、聽覺、觸覺、動作協調的核心刺激\n\n✅ 搖響聲效／觸感材質／抓握轉動／顏色辨識\n✅ 從抓握、搖動到轉壓捏，強化手眼協調與因果理解\n✅ 漸進式玩法：單件練習 → 組合體驗 → 親子互動引導\n✅ 安全圓角、無毒材料，耐用好清潔\n\n適齡：6m+（家長陪同使用更安心）\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/magic-touch-800851\n\n#感官玩具 #嬰幼兒玩具 #早教啟蒙 #手眼協調 #精細動作 #親子互動 #RicOutlet` },
+  { format:'B', title:'Hape Waterfall Tunnel 夢幻瀑布火車隧道',
+    copy:`新上架｜Hape Waterfall Tunnel 夢幻瀑布火車隧道 🚂\n\n讓小火車穿越水景，旅程驚喜感升級\n\n✅ 通用設計：相容多種風格與品牌軌道\n✅ 理想擴充件：快速豐富情境、延長遊玩時間\n✅ 永續理念製造，符合國際安全與品質標準\n\n適齡：3Y+，激發想像力與故事創作\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/hapee3716\n\n#Hape #木製火車 #軌道配件 #火車隧道 #情境扮演 #幼兒玩具 #親子共玩 #RicOutlet` }
+];
 
-      const handleClear = () => {
-        setUrl("");
-        setProductName("");
-        setDescription("");
-        setOutput("");
-        setFetchError("");
-      };
+// =============================================
+// 設定
+// =============================================
+const ADDRESS = '荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室';
 
-      return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-          <div className="bg-white border-b border-gray-200 px-6 py-4">
-            <h1 className="text-xl font-bold text-gray-800">IG 文案產生器</h1>
-            <p className="text-sm text-gray-400 mt-0.5">貼入產品連結或手動輸入，一鍵生成 IG 文案</p>
-          </div>
+const EMOJI_MAP = [
+  ['音樂|musical|music','🎵'],['熊貓|panda','🐼'],['兔|bunny|rabbit','🐰'],
+  ['火車|train|tunnel|隧道','🚂'],['梳妝|vanity','💄'],['積木|block','🧩'],
+  ['感官|sensory','✨'],['福袋|bundle','🎁'],['泳池|pool|whale','🐳'],
+  ['沙|sand','🏖️'],['探險|explorer','🔭'],['公仔|plush','🧸']
+];
 
-          <div className="flex-1 flex flex-col md:flex-row">
-            <div className="w-full md:w-1/2 p-6 flex flex-col gap-5">
+const HASHTAG_RULES = [
+  ['音樂','#音樂玩具','#聽覺發展'],['感官','#感官玩具','#早教啟蒙','#觸覺刺激'],
+  ['積木','#積木','#建構玩具'],['火車|隧道|軌道','#木製火車','#軌道玩具','#情境扮演'],
+  ['梳妝|扮家家','#扮家家酒','#角色扮演','#女孩玩具'],
+  ['安撫|公仔|plush','#安撫玩具','#毛絨公仔'],
+  ['拼圖|puzzle','#拼圖','#益智玩具'],['桌遊','#桌遊'],
+  ['嬰|infant|baby','#嬰幼兒玩具'],['木|wood','#木製玩具','#天然材質'],
+  ['福袋|bundle','#福袋','#限時優惠'],
+  ['hape','#Hape'],['käthe|kathe','#KätheKruse','#德國玩具'],
+  ['eurekakids','#Eurekakids'],['手眼|精細','#手眼協調','#精細動作'],
+];
 
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">產品連結（URL）</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    placeholder="https://eurekakids.com.hk/products/..."
-                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  />
-                  <button
-                    onClick={handleFetch}
-                    disabled={fetching || !url}
-                    className="bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-200 text-white text-sm px-4 py-2 rounded-lg transition"
-                  >
-                    {fetching ? "抓取中…" : "抓取"}
-                  </button>
-                </div>
-                {fetchError && <p className="text-xs text-red-400 mt-1">{fetchError}</p>}
-              </div>
+// =============================================
+// 工具函數
+// =============================================
+function stripHtml(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html || '';
+  return d.textContent || d.innerText || '';
+}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">產品名稱</label>
-                <input
-                  type="text"
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  placeholder="例：木製彩色疊疊樂"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                />
-              </div>
+function getSentences(text) {
+  return text.replace(/\s+/g,' ').split(/(?<=[。！？\.!?])\s*/).map(s=>s.trim()).filter(s=>s.length>4);
+}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">產品描述</label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="簡單描述產品特點、材質、適合年齡等…"
-                  rows={4}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
-                />
-              </div>
+function getEmoji(text) {
+  const t = text.toLowerCase();
+  for (const [keys, emoji] of EMOJI_MAP) {
+    if (keys.split('|').some(k => t.includes(k))) return emoji;
+  }
+  return '🌟';
+}
 
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-600 mb-1">語氣</label>
-                  <select
-                    value={tone}
-                    onChange={(e) => setTone(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  >
-                    {TONES.map((t) => <option key={t}>{t}</option>)}
-                  </select>
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-600 mb-1">長度</label>
-                  <select
-                    value={length}
-                    onChange={(e) => setLength(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  >
-                    {LENGTHS.map((l) => <option key={l}>{l}</option>)}
-                  </select>
-                </div>
-              </div>
+function getHashtags(title, desc, vendor) {
+  const t = (title+' '+desc+' '+vendor).toLowerCase();
+  const tags = new Set(['#親子互動','#幼兒玩具','#RicOutlet','#正品保證']);
+  HASHTAG_RULES.forEach(([keys, ...htags]) => {
+    if (keys.split('|').some(k => t.includes(k.toLowerCase()))) htags.forEach(h => tags.add(h));
+  });
+  return Array.from(tags).slice(0,10).join(' ');
+}
 
-              <div className="flex gap-3">
-                <button
-                  onClick={handleGenerate}
-                  disabled={loading || (!productName && !description)}
-                  className="flex-1 bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-200 text-white font-medium py-2.5 rounded-lg transition text-sm"
-                >
-                  {loading ? "生成中…" : "✦ 生成文案"}
-                </button>
-                <button
-                  onClick={handleClear}
-                  className="px-4 py-2.5 border border-gray-200 hover:bg-gray-100 text-gray-500 rounded-lg text-sm transition"
-                >
-                  一鍵清除
-                </button>
-              </div>
-            </div>
+function fmt(price) {
+  return parseFloat(price).toFixed(2).replace(/\.00$/,'');
+}
 
-            <div className="hidden md:block w-px bg-gray-100" />
+// =============================================
+// 格式生成
+// =============================================
+function genA(p, url) {
+  const desc = getSentences(stripHtml(p.body_html));
+  const body = desc.slice(0,2).join('。') + (desc.length ? '。' : '');
+  const emoji = getEmoji(p.title + body);
+  const price = fmt(p.variants[0].price);
+  const tags = getHashtags(p.title, body, p.vendor);
+  return `${p.vendor}｜${p.title} ${emoji}\n\n${body}\n\n售價 HK$${price}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+}
 
-            <div className="w-full md:w-1/2 p-6 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-600">生成文案</label>
-                {output && (
-                  <button
-                    onClick={handleCopy}
-                    className="text-xs text-indigo-500 hover:text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full transition"
-                  >
-                    {copied ? "已複製 ✓" : "複製文案"}
-                  </button>
-                )}
-              </div>
-              <textarea
-                value={output}
-                onChange={(e) => setOutput(e.target.value)}
-                placeholder="文案會在這裡出現，你可以直接在這裡修改…"
-                rows={14}
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none bg-white"
-              />
-              {output && (
-                <p className="text-xs text-gray-400 text-right">{output.length} 字元</p>
-              )}
-            </div>
-          </div>
+function genB(p, url) {
+  const desc = getSentences(stripHtml(p.body_html));
+  const tagline = desc[0] || '';
+  const points = desc.slice(1,5).map(s=>`✅ ${s}`).join('\n') || '✅ 安全無毒，適合嬰幼兒';
+  const emoji = getEmoji(p.title + tagline);
+  const price = fmt(p.variants[0].price);
+  const tags = getHashtags(p.title, tagline, p.vendor);
+  return `新上架｜${p.title} ${emoji}\n\n${tagline}\n\n${points}\n\n售價 HK$${price}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+}
 
-          <div className="text-center py-4 text-xs text-gray-300 border-t border-gray-100">
-            created by Tabris Yuen @2026
-          </div>
-        </div>
-      );
-    }
+function genC(p, url) {
+  const desc = getSentences(stripHtml(p.body_html));
+  const body = desc.slice(0,2).join('。') + (desc.length ? '。' : '');
+  const v = p.variants[0];
+  const price = fmt(v.price);
+  const origPrice = v.compare_at_price ? fmt(v.compare_at_price) : null;
+  const emoji = getEmoji(p.title + body);
+  const tags = getHashtags(p.title, body, p.vendor);
+  const priceLine = origPrice
+    ? `原價 HK$${origPrice} → 現售 HK$${price} 🏷️`
+    : `售價 HK$${price}`;
+  return `${p.title} ${emoji}\n\n${priceLine}\n\n${body}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+}
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-  </script>
+// =============================================
+// UI
+// =============================================
+let selectedFmt = 'A';
+
+document.querySelectorAll('.fmt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedFmt = btn.dataset.f;
+  });
+});
+
+document.getElementById('genBtn').addEventListener('click', async () => {
+  const raw = document.getElementById('urlInput').value.trim();
+  if (!raw) return setStatus('請貼入產品連結', 'error');
+  if (!raw.includes('/products/')) return setStatus('連結需包含 /products/', 'error');
+
+  const cleanUrl = raw.replace(/\?.*$/,'').replace(/\/$/,'');
+  const jsonUrl = cleanUrl + '.json';
+
+  setStatus('正在抓取資料…', '');
+  document.getElementById('genBtn').disabled = true;
+
+  try {
+    const res = await fetch(jsonUrl);
+    if (!res.ok) throw new Error();
+    const { product } = await res.json();
+
+    // 產品預覽
+    const pb = document.getElementById('previewBox');
+    pb.innerHTML = `<strong>${product.vendor}</strong> — ${product.title}<br>HK$${fmt(product.variants[0].price)}`;
+    pb.classList.add('show');
+
+    // 生成
+    const copy = selectedFmt==='A' ? genA(product, cleanUrl)
+               : selectedFmt==='B' ? genB(product, cleanUrl)
+               : genC(product, cleanUrl);
+
+    document.getElementById('output').value = copy;
+    document.getElementById('outputCard').style.display = 'block';
+    setStatus('✅ 生成完成！', 'success');
+  } catch {
+    setStatus('❌ 無法抓取資料，請確認連結', 'error');
+  } finally {
+    document.getElementById('genBtn').disabled = false;
+  }
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('output').value).then(() => {
+    const b = document.getElementById('copyBtn');
+    b.textContent = '✅ 已複製！';
+    setTimeout(() => b.textContent = '📋 複製文案', 2000);
+  });
+});
+
+function setStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (type ? ' '+type : '');
+}
+</script>
 </body>
 </html>
