@@ -116,7 +116,7 @@ function stripHtml(html) {
 }
 
 function getSentences(text) {
-  return text.replace(/\s+/g,' ').split(/(?<=[。！？\.!?])\s*/).map(s=>s.trim()).filter(s=>s.length>4);
+  return text.replace(/\s+/g,' ').split(/(?<=[。！？\.!?])\s*/).map(s=>s.trim().replace(/[。！？\.!?]+$/,'')).filter(s=>s.length>4);
 }
 
 function getEmoji(text) {
