@@ -166,7 +166,7 @@ function genA(p, url) {
   const parts = [`Hape｜${p.title}`, hook];
   if (para1.length > 2) parts.push(para1);
   if (para2.length > 2) parts.push(para2);
-  parts.push(tagline, `🔗 ${url}`, tags);
+  parts.push(tagline, tags);
 
   return parts.join('\n\n');
 }
