@@ -3,129 +3,216 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RicOutlet IG 文案生成器</title>
+  <title>Hape Social Media 文案生成器</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f4f8; color: #333; min-height: 100vh; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff9f5; color: #333; min-height: 100vh; }
     .container { max-width: 600px; margin: 0 auto; padding: 28px 16px; }
-    h1 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #111; }
-    .card { background: white; border-radius: 14px; padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-    label { display: block; font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    input[type="text"] { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; outline: none; transition: border-color 0.2s; color: #333; }
-    input[type="text"]:focus { border-color: #6366f1; }
 
-    /* ── 格式按鈕：flex-wrap，3+2 排列 ── */
+    .header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .hape-badge { background: #F4841F; color: white; font-size: 13px; font-weight: 900; padding: 5px 12px; border-radius: 7px; letter-spacing: 2px; }
+    h1 { font-size: 17px; font-weight: 700; color: #111; }
+
+    .card { background: white; border-radius: 14px; padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    label { display: block; font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+
+    input[type="text"] { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; outline: none; transition: border-color 0.2s; color: #333; }
+    input[type="text"]:focus { border-color: #F4841F; }
+
+    /* ── 平台選擇 ── */
+    .platform-group { display: flex; gap: 8px; margin-bottom: 16px; }
+    .plat-btn {
+      flex: 1; padding: 10px 4px;
+      border: 1.5px solid #e5e5e5; background: white;
+      border-radius: 9px; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all 0.18s; color: #666; text-align: center;
+    }
+    .plat-btn.active { border-color: #F4841F; background: #F4841F; color: white; }
+    .plat-btn:hover:not(.active) { border-color: #F4841F; color: #F4841F; }
+
+    /* ── 格式按鈕 ── */
     .format-group { display: flex; flex-wrap: wrap; gap: 8px; }
     .fmt-btn {
       flex: 1 1 calc(33.333% - 8px);
       min-width: calc(33.333% - 8px);
       padding: 11px 4px;
-      border: 1.5px solid #e5e5e5;
-      background: white;
-      border-radius: 9px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.18s;
-      color: #555;
-      text-align: center;
+      border: 1.5px solid #e5e5e5; background: white;
+      border-radius: 9px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.18s; color: #555; text-align: center;
     }
-    .fmt-btn.active { border-color: #6366f1; background: #6366f1; color: white; }
-    .fmt-btn:hover:not(.active) { border-color: #6366f1; color: #6366f1; }
+    .fmt-btn.active { border-color: #F4841F; background: #F4841F; color: white; }
+    .fmt-btn:hover:not(.active) { border-color: #F4841F; color: #F4841F; }
 
-    .gen-btn { width: 100%; padding: 13px; background: #6366f1; color: white; border: none; border-radius: 9px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-    .gen-btn:hover { background: #4f46e5; }
-    .gen-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
-    .status { font-size: 13px; text-align: center; min-height: 18px; margin-top: 10px; color: #888; }
+    .fmt-desc { font-size: 11.5px; color: #aaa; margin-top: 10px; min-height: 16px; }
+
+    .gen-btn { width: 100%; padding: 13px; background: #F4841F; color: white; border: none; border-radius: 9px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .gen-btn:hover { background: #d9700f; }
+    .gen-btn:disabled { background: #f8c99b; cursor: not-allowed; }
+    .status { font-size: 13px; text-align: center; min-height: 18px; margin-top: 10px; color: #aaa; }
     .status.error { color: #ef4444; }
     .status.success { color: #10b981; }
-    .preview-box { margin-top: 12px; background: #f8f8fc; border-radius: 8px; padding: 10px 13px; font-size: 13px; color: #555; display: none; }
+
+    .preview-box {
+      margin-top: 12px; background: #fff5ee;
+      border-left: 3px solid #F4841F;
+      border-radius: 0 8px 8px 0; padding: 10px 13px;
+      font-size: 13px; color: #666; display: none;
+    }
     .preview-box.show { display: block; }
-    .preview-box strong { color: #333; }
-    textarea { width: 100%; min-height: 220px; padding: 13px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; line-height: 1.75; resize: vertical; font-family: inherit; outline: none; color: #333; }
-    .copy-btn { width: 100%; padding: 11px; background: #10b981; color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
+    .preview-box strong { color: #222; }
+    .preview-box .age-tag {
+      display: inline-block; margin-top: 5px;
+      background: #F4841F; color: white;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px;
+    }
+
+    textarea { width: 100%; min-height: 260px; padding: 13px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; line-height: 1.8; resize: vertical; font-family: inherit; outline: none; color: #333; }
+    textarea:focus { border-color: #F4841F; }
+
+    .output-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .char-count { font-size: 11px; color: #bbb; }
+    .copy-btn { padding: 11px 20px; background: #10b981; color: white; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
     .copy-btn:hover { background: #059669; }
+
     #outputCard { display: none; }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>🛍️ RicOutlet IG 文案生成器</h1>
+  <div class="header">
+    <span class="hape-badge">HAPE</span>
+    <h1>Social Media Post 產生器</h1>
+  </div>
 
+  <!-- 產品連結 -->
   <div class="card">
+    <label>平台</label>
+    <div class="platform-group">
+      <button class="plat-btn active" data-p="IG">📸 Instagram</button>
+      <button class="plat-btn" data-p="FB">👍 Facebook</button>
+      <button class="plat-btn" data-p="XHS">🌸 小紅書</button>
+    </div>
     <label>產品連結</label>
-    <input type="text" id="urlInput" placeholder="https://www.ricoutlet.com.hk/products/..." />
+    <input type="text" id="urlInput" placeholder="https://www.ricoutlet.com.hk/products/hape..." />
     <div class="preview-box" id="previewBox"></div>
   </div>
 
+  <!-- 格式 -->
   <div class="card">
     <label>文案格式</label>
     <div class="format-group">
-      <button class="fmt-btn active" data-f="A">A｜簡潔</button>
-      <button class="fmt-btn" data-f="B">B｜新上架</button>
-      <button class="fmt-btn" data-f="C">C｜優惠</button>
-      <button class="fmt-btn" data-f="D">D｜預留</button>
-      <button class="fmt-btn" data-f="E">E｜預留</button>
+      <button class="fmt-btn active" data-f="A">A｜簡介</button>
+      <button class="fmt-btn"        data-f="B">B｜教育重點</button>
+      <button class="fmt-btn"        data-f="C">C｜永續環保</button>
+      <button class="fmt-btn"        data-f="D">D｜新上架</button>
+      <button class="fmt-btn"        data-f="E">E｜親子共玩</button>
     </div>
+    <div class="fmt-desc" id="fmtDesc">簡潔介紹產品，附售價與地址。</div>
   </div>
 
+  <!-- 生成 -->
   <div class="card">
-    <button class="gen-btn" id="genBtn">生成文案</button>
+    <button class="gen-btn" id="genBtn">✨ 生成文案</button>
     <div class="status" id="status"></div>
   </div>
 
+  <!-- 輸出 -->
   <div class="card" id="outputCard">
     <label>生成結果</label>
     <textarea id="output" readonly></textarea>
-    <button class="copy-btn" id="copyBtn">📋 複製文案</button>
+    <div class="output-footer">
+      <span class="char-count" id="charCount">0 字</span>
+      <button class="copy-btn" id="copyBtn">📋 複製文案</button>
+    </div>
   </div>
 </div>
 
 <script>
 // =============================================
-// 文案庫（後台用，前台不顯示）
-// =============================================
-const COPY_LIBRARY = [
-  { format:'A', title:'CUCU 音樂熊貓',
-    copy:`CUCU｜Cucu Hanging Musical Plush Toy Panda 音樂熊貓 🐼🎵\n\n採用可愛熊貓造型設計，結合柔和音樂功能，為寶寶提供安心陪伴與感官刺激。可懸掛於嬰兒床、推車或遊戲架上，透過拉動或觸碰啟動音樂，幫助寶寶建立因果關係理解，同時促進聽覺發展與專注力。\n\n售價 HK$139.00\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/cucu-panda\n\n#音樂玩具 #嬰幼兒玩具 #感官玩具 #安撫玩具 #親子互動 #早教啟蒙 #RicOutlet` },
-  { format:'C', title:'$399 精選福袋',
-    copy:`$399 精選福袋（原價$700）5 件帶走 🎁✨\nCOMBAT SHIP／Ocean Rescue／Collage Kit／WHO IS WHO／Push and Run Fox\n\n一次收齊 5 件人氣玩具，涵蓋桌遊、拼圖、幼兒推拉與藝術創作等多元玩法，兼顧想像力、手眼協調與精細動作發展。\n✅ 組合固定，不設自選｜門市與網店同步發售｜數量有限，售完即止\n\n售價 $399（原價 $700）\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/bundle-399\n\n#福袋 #限時優惠 #玩具優惠 #親子互動 #幼兒玩具 #RicOutlet` },
-  { format:'A', title:'Käthe Kruse 兔子安撫娃娃',
-    copy:`Käthe Kruse｜Bunny Pino Dangle Hase Pino 兔子安撫娃娃 35cm 🐰✨\n\n可愛兔子造型＋長條柔軟身形，特別適合寶寶抓握與擁抱；可作為吊掛裝飾或安撫玩偶使用，陪伴寶寶建立安全感與情緒安定。\n\n售價 HK$449.00\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/kathe-kruse-bunny-pino-dangle-hase-pino-35cm\n\n#安撫玩具 #毛絨公仔 #嬰幼兒玩具 #德國玩具 #送禮之選 #RicOutlet` },
-  { format:'B', title:'Tickled Pink Girls Vanity 女孩梳妝台套裝',
-    copy:`新上架｜Tickled Pink Girls Vanity 女孩梳妝台套裝 💄\n\n扮家家酒升級，專屬小公主的梳妝時刻\n\n✅ 安全鏡面＋圓角設計，放心照鏡玩造型\n✅ 收納抽屜／層架，髮飾與配件唔再東掉西漏\n✅ 附玩具梳子與飾品，道具完整更投入\n✅ 穩固桌椅組，居家角落一秒變角色扮演區\n\n適齡：3Y+｜培養自我照護 routine、想像力與精細動作\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/hapee8350\n\n#梳妝台玩具 #扮家家酒 #角色扮演 #女孩玩具 #親子互動 #精細動作 #RicOutlet` },
-  { format:'B', title:'Four Fundamentals 四款基本感官玩具',
-    copy:`新上架｜Four Fundamentals 四款基本感官玩具 🌈\n\n一次入手視覺、聽覺、觸覺、動作協調的核心刺激\n\n✅ 搖響聲效／觸感材質／抓握轉動／顏色辨識\n✅ 從抓握、搖動到轉壓捏，強化手眼協調與因果理解\n✅ 漸進式玩法：單件練習 → 組合體驗 → 親子互動引導\n✅ 安全圓角、無毒材料，耐用好清潔\n\n適齡：6m+（家長陪同使用更安心）\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/magic-touch-800851\n\n#感官玩具 #嬰幼兒玩具 #早教啟蒙 #手眼協調 #精細動作 #親子互動 #RicOutlet` },
-  { format:'B', title:'Hape Waterfall Tunnel 夢幻瀑布火車隧道',
-    copy:`新上架｜Hape Waterfall Tunnel 夢幻瀑布火車隧道 🚂\n\n讓小火車穿越水景，旅程驚喜感升級\n\n✅ 通用設計：相容多種風格與品牌軌道\n✅ 理想擴充件：快速豐富情境、延長遊玩時間\n✅ 永續理念製造，符合國際安全與品質標準\n\n適齡：3Y+，激發想像力與故事創作\n\n立即入手 ⬇\n📍 荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室\n🔗 https://www.ricoutlet.com.hk/products/hapee3716\n\n#Hape #木製火車 #軌道配件 #火車隧道 #情境扮演 #幼兒玩具 #親子共玩 #RicOutlet` }
-];
-
-// =============================================
 // 設定
 // =============================================
 const ADDRESS = '荔枝角 長義街 2-4 號｜新昌工業大廈 6 樓 602 室';
 
+const FMT_DESC = {
+  A: '簡潔介紹產品，附售價與地址。',
+  B: '列出教育與發展重點，✅ 條列式。',
+  C: '強調 Hape 永續理念與環保材料。',
+  D: '🆕 新上架風格，條列賣點。',
+  E: '加入親子共玩 Tips 與品牌標語。',
+};
+
+// ── Emoji 對應 ──
 const EMOJI_MAP = [
-  ['音樂|musical|music','🎵'],['熊貓|panda','🐼'],['兔|bunny|rabbit','🐰'],
-  ['火車|train|tunnel|隧道','🚂'],['梳妝|vanity','💄'],['積木|block','🧩'],
-  ['感官|sensory','✨'],['福袋|bundle','🎁'],['泳池|pool|whale','🐳'],
-  ['沙|sand','🏖️'],['探險|explorer','🔭'],['公仔|plush','🧸']
+  ['train|tunnel|rail|火車|隧道|軌道', '🚂'],
+  ['music|piano|drum|音樂|鼓|琴|xylophone', '🎵'],
+  ['kitchen|food|廚房|食物|烹飪|cook', '🍳'],
+  ['ball|球', '⚽'],
+  ['art|paint|draw|畫|藝術|塗鴉|color', '🎨'],
+  ['baby|嬰兒|安撫|infant', '🧸'],
+  ['puzzle|拼圖', '🧩'],
+  ['doll|娃娃|公仔|plush', '👧'],
+  ['sand|beach|沙|海灘', '🏖️'],
+  ['block|積木|build', '🏗️'],
+  ['science|experiment|科學|stem', '🔬'],
+  ['outdoor|explorer|戶外|探索', '🌿'],
+  ['garden|花|plant|種植', '🌱'],
+  ['push|pull|推|拉|ride|滑', '🛺'],
 ];
 
+// ── 年齡偵測 ──
+const AGE_MAP = [
+  [['0m','newborn','0個月','初生'], '0M+'],
+  [['6m','6個月'], '6M+'],
+  [['12m','1y','1歲','12個月'], '1Y+'],
+  [['18m','18個月'], '18M+'],
+  [['2y','2歲'], '2Y+'],
+  [['3y','3歲'], '3Y+'],
+  [['4y','4歲'], '4Y+'],
+  [['5y','5歲'], '5Y+'],
+  [['6y','6歲'], '6Y+'],
+  [['8y','8歲'], '8Y+'],
+];
+
+// ── Hashtag ──
+const BASE_IG  = ['#Hape','#HapeToys','#LearnThroughPlay','#木製玩具','#環保玩具','#親子互動','#幼兒玩具','#RicOutlet'];
+const BASE_FB  = ['#Hape','#HapeToys','#LearnThroughPlay','#木製玩具','#親子互動','#RicOutlet'];
+const BASE_XHS = ['#Hape','#木製玩具','#環保玩具','#親子互動','#益智玩具','#早教啟蒙','#RicOutlet'];
+
 const HASHTAG_RULES = [
-  ['音樂','#音樂玩具','#聽覺發展'],['感官','#感官玩具','#早教啟蒙','#觸覺刺激'],
-  ['積木','#積木','#建構玩具'],['火車|隧道|軌道','#木製火車','#軌道玩具','#情境扮演'],
-  ['梳妝|扮家家','#扮家家酒','#角色扮演','#女孩玩具'],
-  ['安撫|公仔|plush','#安撫玩具','#毛絨公仔'],
-  ['拼圖|puzzle','#拼圖','#益智玩具'],['桌遊','#桌遊'],
-  ['嬰|infant|baby','#嬰幼兒玩具'],['木|wood','#木製玩具','#天然材質'],
-  ['福袋|bundle','#福袋','#限時優惠'],
-  ['hape','#Hape'],['käthe|kathe','#KätheKruse','#德國玩具'],
-  ['eurekakids','#Eurekakids'],['手眼|精細','#手眼協調','#精細動作'],
+  ['train|tunnel|rail|火車|隧道|軌道', ['#木製火車','#軌道玩具','#HapeTrain','#情境扮演']],
+  ['music|piano|drum|音樂|鼓|琴',     ['#音樂玩具','#聽覺發展','#HapeMusic']],
+  ['kitchen|food|廚房|食物|烹飪',     ['#扮家家酒','#角色扮演','#HapeKitchen']],
+  ['art|paint|draw|畫|藝術',          ['#創意玩具','#藝術啟蒙','#HapeArt']],
+  ['puzzle|拼圖',                      ['#拼圖','#益智玩具','#手眼協調']],
+  ['block|積木',                       ['#積木','#建構玩具','#創造力']],
+  ['baby|嬰兒|0m|6m',                 ['#嬰幼兒玩具','#感官玩具','#HapeBaby']],
+  ['science|stem|科學',               ['#STEM玩具','#科學探索']],
+  ['outdoor|戶外|explorer',           ['#戶外玩具','#探索精神']],
+  ['sand|beach|沙|海灘',              ['#感官玩具','#沙水玩具']],
+  ['push|pull|ride|推|拉|滑',         ['#大肌肉發展','#動態玩具']],
+];
+
+// ── 品牌標語（隨機選）──
+const TAGLINES = [
+  '以玩樂探索世界，以童年定義未來。',
+  '每一件玩具，都是成長的起點。',
+  '從手中開始，讓好奇心帶路。',
+  'Play More. Learn More. Share More.',
+  '木製溫度，陪伴每個珍貴當下。',
+];
+
+// ── 永續文案 ──
+const ECO_LINES = [
+  '🌱 FSC 認證木材，對地球友善',
+  '♻️ 水性無毒漆料，安心讓寶寶接觸',
+  '🔒 通過 CE / ASTM 等國際安全標準',
+  '🌍 Hape 每賣出一件，即植一棵樹',
+  '🏆 榮獲多項國際玩具大獎認可',
 ];
 
 // =============================================
-// 工具函數
+// 工具
 // =============================================
 function stripHtml(html) {
   const d = document.createElement('div');
@@ -134,96 +221,135 @@ function stripHtml(html) {
 }
 
 function getSentences(text) {
-  return text.replace(/\s+/g,' ').split(/(?<=[。！？\.!?])\s*/).map(s=>s.trim().replace(/[。！？\.!?]+$/,'')).filter(s=>s.length>4);
+  return text
+    .replace(/\s+/g, ' ')
+    .split(/(?<=[。！？.!?\n])\s*/)
+    .map(s => s.trim().replace(/[。！？.!?]+$/, ''))
+    .filter(s => s.length > 4);
 }
 
 function getEmoji(text) {
   const t = text.toLowerCase();
-  for (const [keys, emoji] of EMOJI_MAP) {
-    if (keys.split('|').some(k => t.includes(k))) return emoji;
+  for (const [keys, em] of EMOJI_MAP) {
+    if (keys.split('|').some(k => t.includes(k))) return em;
   }
-  return '🌟';
+  return '✨';
 }
 
-function getHashtags(title, desc, vendor) {
-  const t = (title+' '+desc+' '+vendor).toLowerCase();
-  const tags = new Set(['#親子互動','#幼兒玩具','#RicOutlet','#正品保證']);
-  HASHTAG_RULES.forEach(([keys, ...htags]) => {
-    if (keys.split('|').some(k => t.includes(k.toLowerCase()))) htags.forEach(h => tags.add(h));
+function getAge(text) {
+  const t = text.toLowerCase();
+  for (const [keys, age] of AGE_MAP) {
+    if (keys.some(k => t.includes(k))) return age;
+  }
+  return null;
+}
+
+function getHashtags(title, body, platform) {
+  const t = (title + ' ' + body).toLowerCase();
+  const base = platform === 'XHS' ? [...BASE_XHS]
+             : platform === 'FB'  ? [...BASE_FB]
+             : [...BASE_IG];
+  const tags = new Set(base);
+  HASHTAG_RULES.forEach(([keys, htags]) => {
+    if (keys.split('|').some(k => t.includes(k))) htags.forEach(h => tags.add(h));
   });
-  return Array.from(tags).slice(0,10).join(' ');
+  const limit = platform === 'XHS' ? 8 : 10;
+  return Array.from(tags).slice(0, limit).join(' ');
 }
 
 function fmt(price) {
-  return parseFloat(price).toFixed(2).replace(/\.00$/,'');
+  return parseFloat(price).toFixed(2).replace(/\.00$/, '');
+}
+
+function randTagline() {
+  return TAGLINES[Math.floor(Math.random() * TAGLINES.length)];
+}
+
+function ecoBlock(n = 3) {
+  return ECO_LINES.slice(0, n).join('\n');
 }
 
 // =============================================
 // 格式生成
 // =============================================
-function genA(p, url) {
+
+// A｜簡介
+function genA(p, url, plat) {
   const desc = getSentences(stripHtml(p.body_html));
-  const body = desc.slice(0,2).join('。') + (desc.length ? '。' : '');
-  const emoji = getEmoji(p.title + body);
-  const price = fmt(p.variants[0].price);
-  const tags = getHashtags(p.title, body, p.vendor);
-  return `${p.vendor}｜${p.title} ${emoji}\n\n${body}\n\n售價 HK$${price}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+  const body = desc.slice(0, 2).join('。') + (desc.length ? '。' : '');
+  const em   = getEmoji(p.title + body);
+  const age  = getAge(p.title + ' ' + body);
+  const ageLine = age ? `\n適齡：${age}` : '';
+  const tags = getHashtags(p.title, body, plat);
+  return `Hape｜${p.title} ${em}\n\n${body}${ageLine}\n\n售價 HK$${fmt(p.variants[0].price)}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
 }
 
-function genB(p, url) {
-  const desc = getSentences(stripHtml(p.body_html));
+// B｜教育重點
+function genB(p, url, plat) {
+  const desc    = getSentences(stripHtml(p.body_html));
   const tagline = desc[0] || '';
-  const points = desc.slice(1,5).map(s=>`✅ ${s}`).join('\n') || '✅ 安全無毒，適合嬰幼兒';
-  const emoji = getEmoji(p.title + tagline);
-  const price = fmt(p.variants[0].price);
-  const tags = getHashtags(p.title, tagline, p.vendor);
-  return `新上架｜${p.title} ${emoji}\n\n${tagline}\n\n${points}\n\n售價 HK$${price}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+  const points  = desc.slice(1, 5).map(s => `✅ ${s}`).join('\n') || '✅ 多元感官刺激，促進全面發展';
+  const em      = getEmoji(p.title + tagline);
+  const age     = getAge(p.title + ' ' + tagline);
+  const ageLine = age ? `\n\n🎯 適齡：${age}` : '';
+  const tags    = getHashtags(p.title, tagline, plat);
+  return `Hape｜${p.title} ${em}\n\n${tagline}${ageLine}\n\n${points}\n\n售價 HK$${fmt(p.variants[0].price)}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
 }
 
-function genC(p, url) {
+// C｜永續環保
+function genC(p, url, plat) {
   const desc = getSentences(stripHtml(p.body_html));
-  const body = desc.slice(0,2).join('。') + (desc.length ? '。' : '');
-  const v = p.variants[0];
-  const price = fmt(v.price);
-  const origPrice = v.compare_at_price ? fmt(v.compare_at_price) : null;
-  const emoji = getEmoji(p.title + body);
-  const tags = getHashtags(p.title, body, p.vendor);
-  const priceLine = origPrice
-    ? `原價 HK$${origPrice} → 現售 HK$${price} 🏷️`
-    : `售價 HK$${price}`;
-  return `${p.title} ${emoji}\n\n${priceLine}\n\n${body}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+  const body = desc.slice(0, 1).join('') + (desc.length ? '。' : '');
+  const em   = getEmoji(p.title + body);
+  const age  = getAge(p.title + ' ' + body);
+  const ageLine = age ? `\n適齡：${age}` : '';
+  const tags = getHashtags(p.title, body, plat);
+  return `Hape｜${p.title} ${em}\n\n${body}${ageLine}\n\n${ecoBlock(3)}\n\nHape 以永續為核心，讓孩子在玩耍中成長，也讓地球得到守護。\n\n售價 HK$${fmt(p.variants[0].price)}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
 }
 
-// ── D｜預留（可自訂格式） ──
-function genD(p, url) {
-  const desc = getSentences(stripHtml(p.body_html));
-  const body = desc.slice(0,2).join('。') + (desc.length ? '。' : '');
-  const emoji = getEmoji(p.title + body);
-  const price = fmt(p.variants[0].price);
-  const tags = getHashtags(p.title, body, p.vendor);
-  return `${p.vendor}｜${p.title} ${emoji}\n\n${body}\n\n售價 HK$${price}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+// D｜新上架
+function genD(p, url, plat) {
+  const desc   = getSentences(stripHtml(p.body_html));
+  const intro  = desc[0] || '';
+  const points = desc.slice(1, 4).map(s => `✅ ${s}`).join('\n') || '✅ 設計精良，適合日常玩耍';
+  const em     = getEmoji(p.title + intro);
+  const age    = getAge(p.title + ' ' + intro);
+  const ageLine = age ? `\n\n🎯 適齡：${age}` : '';
+  const tags   = getHashtags(p.title, intro, plat);
+  return `🆕 新上架｜Hape ${p.title} ${em}\n\n${intro}${ageLine}\n\n${points}\n\n售價 HK$${fmt(p.variants[0].price)}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
 }
 
-// ── E｜預留（可自訂格式） ──
-function genE(p, url) {
+// E｜親子共玩
+function genE(p, url, plat) {
   const desc = getSentences(stripHtml(p.body_html));
-  const body = desc.slice(0,2).join('。') + (desc.length ? '。' : '');
-  const emoji = getEmoji(p.title + body);
-  const price = fmt(p.variants[0].price);
-  const tags = getHashtags(p.title, body, p.vendor);
-  return `${p.vendor}｜${p.title} ${emoji}\n\n${body}\n\n售價 HK$${price}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+  const body = desc.slice(0, 2).join('。') + (desc.length ? '。' : '');
+  const em   = getEmoji(p.title + body);
+  const age  = getAge(p.title + ' ' + body);
+  const ageLine = age ? `\n🎯 適齡：${age}` : '';
+  const tags = getHashtags(p.title, body, plat);
+  return `Hape｜${p.title} ${em}\n\n「${randTagline()}」\n\n${body}${ageLine}\n\n👨‍👩‍👧 親子共玩 Tips\n一起動手玩，讓孩子在互動中建立自信與創造力。\n\n售價 HK$${fmt(p.variants[0].price)}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
 }
 
 // =============================================
 // UI
 // =============================================
-let selectedFmt = 'A';
+let selectedFmt  = 'A';
+let selectedPlat = 'IG';
 
 document.querySelectorAll('.fmt-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedFmt = btn.dataset.f;
+    document.getElementById('fmtDesc').textContent = FMT_DESC[selectedFmt] || '';
+  });
+});
+
+document.querySelectorAll('.plat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.plat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedPlat = btn.dataset.p;
   });
 });
 
@@ -232,10 +358,10 @@ document.getElementById('genBtn').addEventListener('click', async () => {
   if (!raw) return setStatus('請貼入產品連結', 'error');
   if (!raw.includes('/products/')) return setStatus('連結需包含 /products/', 'error');
 
-  const cleanUrl = raw.replace(/\?.*$/,'').replace(/\/$/,'');
-  const jsonUrl = cleanUrl + '.json';
+  const cleanUrl = raw.replace(/\?.*$/, '').replace(/\/$/, '');
+  const jsonUrl  = cleanUrl + '.json';
 
-  setStatus('正在抓取資料…', '');
+  setStatus('正在抓取 Hape 產品資料…', '');
   document.getElementById('genBtn').disabled = true;
 
   try {
@@ -243,26 +369,33 @@ document.getElementById('genBtn').addEventListener('click', async () => {
     if (!res.ok) throw new Error();
     const { product } = await res.json();
 
-    // 產品預覽
-    const pb = document.getElementById('previewBox');
-    pb.innerHTML = `<strong>${product.vendor}</strong> — ${product.title}<br>HK$${fmt(product.variants[0].price)}`;
+    // 預覽
+    const pb  = document.getElementById('previewBox');
+    const age = getAge(product.title + ' ' + stripHtml(product.body_html));
+    pb.innerHTML = `<strong>${product.title}</strong><br>HK$${fmt(product.variants[0].price)} · ${product.vendor}`
+      + (age ? `<br><span class="age-tag">${age}</span>` : '');
     pb.classList.add('show');
 
     // 生成
-    const copy = selectedFmt==='A' ? genA(product, cleanUrl)
-               : selectedFmt==='B' ? genB(product, cleanUrl)
-               : selectedFmt==='C' ? genC(product, cleanUrl)
-               : selectedFmt==='D' ? genD(product, cleanUrl)
-               : genE(product, cleanUrl);
+    const copy = selectedFmt === 'A' ? genA(product, cleanUrl, selectedPlat)
+               : selectedFmt === 'B' ? genB(product, cleanUrl, selectedPlat)
+               : selectedFmt === 'C' ? genC(product, cleanUrl, selectedPlat)
+               : selectedFmt === 'D' ? genD(product, cleanUrl, selectedPlat)
+               : genE(product, cleanUrl, selectedPlat);
 
     document.getElementById('output').value = copy;
+    document.getElementById('charCount').textContent = copy.length + ' 字';
     document.getElementById('outputCard').style.display = 'block';
     setStatus('✅ 生成完成！', 'success');
   } catch {
-    setStatus('❌ 無法抓取資料，請確認連結', 'error');
+    setStatus('❌ 無法抓取資料，請確認連結是否正確', 'error');
   } finally {
     document.getElementById('genBtn').disabled = false;
   }
+});
+
+document.getElementById('output').addEventListener('input', function () {
+  document.getElementById('charCount').textContent = this.value.length + ' 字';
 });
 
 document.getElementById('copyBtn').addEventListener('click', () => {
@@ -276,7 +409,7 @@ document.getElementById('copyBtn').addEventListener('click', () => {
 function setStatus(msg, type) {
   const el = document.getElementById('status');
   el.textContent = msg;
-  el.className = 'status' + (type ? ' '+type : '');
+  el.className = 'status' + (type ? ' ' + type : '');
 }
 </script>
 </body>
