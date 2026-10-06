@@ -13,10 +13,26 @@
     label { display: block; font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
     input[type="text"] { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; outline: none; transition: border-color 0.2s; color: #333; }
     input[type="text"]:focus { border-color: #6366f1; }
-    .format-group { display: flex; gap: 8px; }
-    .fmt-btn { flex: 1; padding: 11px 6px; border: 1.5px solid #e5e5e5; background: white; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.18s; color: #555; }
+
+    /* ── 格式按鈕：flex-wrap，3+2 排列 ── */
+    .format-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .fmt-btn {
+      flex: 1 1 calc(33.333% - 8px);
+      min-width: calc(33.333% - 8px);
+      padding: 11px 4px;
+      border: 1.5px solid #e5e5e5;
+      background: white;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      color: #555;
+      text-align: center;
+    }
     .fmt-btn.active { border-color: #6366f1; background: #6366f1; color: white; }
     .fmt-btn:hover:not(.active) { border-color: #6366f1; color: #6366f1; }
+
     .gen-btn { width: 100%; padding: 13px; background: #6366f1; color: white; border: none; border-radius: 9px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
     .gen-btn:hover { background: #4f46e5; }
     .gen-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
@@ -48,6 +64,8 @@
       <button class="fmt-btn active" data-f="A">A｜簡潔</button>
       <button class="fmt-btn" data-f="B">B｜新上架</button>
       <button class="fmt-btn" data-f="C">C｜優惠</button>
+      <button class="fmt-btn" data-f="D">D｜預留</button>
+      <button class="fmt-btn" data-f="E">E｜預留</button>
     </div>
   </div>
 
@@ -176,6 +194,26 @@ function genC(p, url) {
   return `${p.title} ${emoji}\n\n${priceLine}\n\n${body}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
 }
 
+// ── D｜預留（可自訂格式） ──
+function genD(p, url) {
+  const desc = getSentences(stripHtml(p.body_html));
+  const body = desc.slice(0,2).join('。') + (desc.length ? '。' : '');
+  const emoji = getEmoji(p.title + body);
+  const price = fmt(p.variants[0].price);
+  const tags = getHashtags(p.title, body, p.vendor);
+  return `${p.vendor}｜${p.title} ${emoji}\n\n${body}\n\n售價 HK$${price}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+}
+
+// ── E｜預留（可自訂格式） ──
+function genE(p, url) {
+  const desc = getSentences(stripHtml(p.body_html));
+  const body = desc.slice(0,2).join('。') + (desc.length ? '。' : '');
+  const emoji = getEmoji(p.title + body);
+  const price = fmt(p.variants[0].price);
+  const tags = getHashtags(p.title, body, p.vendor);
+  return `${p.vendor}｜${p.title} ${emoji}\n\n${body}\n\n售價 HK$${price}\n\n立即入手 ⬇\n📍 ${ADDRESS}\n🔗 ${url}\n\n${tags}`;
+}
+
 // =============================================
 // UI
 // =============================================
@@ -213,7 +251,9 @@ document.getElementById('genBtn').addEventListener('click', async () => {
     // 生成
     const copy = selectedFmt==='A' ? genA(product, cleanUrl)
                : selectedFmt==='B' ? genB(product, cleanUrl)
-               : genC(product, cleanUrl);
+               : selectedFmt==='C' ? genC(product, cleanUrl)
+               : selectedFmt==='D' ? genD(product, cleanUrl)
+               : genE(product, cleanUrl);
 
     document.getElementById('output').value = copy;
     document.getElementById('outputCard').style.display = 'block';
