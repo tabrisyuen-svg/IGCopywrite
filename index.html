@@ -22,7 +22,7 @@
     .preview-box { margin-top: 12px; background: #f8f8fc; border-radius: 8px; padding: 10px 13px; font-size: 13px; color: #555; display: none; }
     .preview-box.show { display: block; }
     .preview-box strong { color: #333; }
-    textarea { width: 100%; min-height: 260px; padding: 13px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; line-height: 1.75; resize: vertical; font-family: inherit; outline: none; color: #333; }
+    textarea { width: 100%; min-height: 320px; padding: 13px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; line-height: 1.75; resize: vertical; font-family: inherit; outline: none; color: #333; }
     .copy-btn { width: 100%; padding: 11px; background: #10b981; color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
     .copy-btn:hover { background: #059669; }
     #outputCard { display: none; }
@@ -45,7 +45,7 @@
 
   <div class="card" id="outputCard">
     <label>生成結果</label>
-    <textarea id="output" readonly></textarea>
+    <textarea id="output"></textarea>
     <button class="copy-btn" id="copyBtn">📋 複製文案</button>
   </div>
 </div>
@@ -57,14 +57,14 @@
 const COPY_LIBRARY = [
   { title:'Magic Touch Shopping Basket™',
     copy:`Magic Touch Shopping Basket™｜Hape 魔幻觸控超市購物籃角色扮演玩具\n\n摸一摸、配一配、買一買，孩子的超市場景探索，就由這個會互動的購物籃開始。\n\n結合角色扮演、形狀配對與多語言學習設計，讓孩子透過輕觸 Magic Touch™ 感應面板，即時觸發趣味音效與購物主題旋律，投入更生動的情境遊戲。\n\n內附食物造型積木，可在配對與收納過程中培養精細動作與認知能力；探索模式更可學習食物名稱與顏色，讓孩子在遊戲中自然發展語言理解、手眼協調與生活情境表達能力，小巧便攜設計亦方便外出攜帶，隨時展開學習與玩樂時光。\n\n🛒 Touch, match and shop through playful discovery.\n\n#Hape #HapeHK #MagicTouchShoppingBasket #魔幻觸控超市購物籃角色扮演玩具 #BabyEinstein #PretendPlay #LanguageDevelopment #FineMotorSkills #LearningThroughPlay #CreativePlay` },
-  { title:'Smart Start ABC Blocks (10pcs)',
+  { title:'Smart Start ABC Blocks',
     copy:`Smart Start ABC Blocks (10pcs)｜Hape 靜感軟矽積木 10 件\n\n抓一抓、疊一疊、認一認，孩子的早期學習探索，就由這套柔和好玩的積木開始。\n\n以 10 件木製積木結合柔軟矽膠包邊與鮮明色彩設計，讓孩子在安全又安靜的遊戲體驗中，自然展開抓握、堆疊與排列的探索過程。\n\n積木融入英文字母、數字與圖案元素，幫助孩子在動手操作中建立顏色辨識、基礎認知、手眼協調與精細動作能力，同時透過堆砌與組合，逐步發展空間概念與初步解難思維，特別適合小手日常玩樂與成長練習。\n\n🌈 Stack, learn and discover through every touch.\n\n#Hape #HapeHK #SmartStartABCBlocks #靜感軟矽積木10件 #BabyToys #EarlyLearning #FineMotorSkills #SensoryPlay #LearningThroughPlay #CreativePlay` },
-  { title:'Hape Avocado Fidget',
-    copy:`Hape Avocado Fidget｜牛油果減壓手感玩具\n\n按一按、轉一轉、摸一摸，把放鬆感與專注力輕輕握在手心之中。\n\n這款可愛牛油果造型的手感減壓玩具，以小巧輕便設計結合木質中心結構，讓孩子在按壓、轉動與反覆觸摸的過程中，享受穩定情緒與放鬆感官的互動體驗。\n\n透過簡單重複的手部操作，孩子不但可逐步提升專注力與手眼協調能力，亦有助發展精細動作與感官調節能力。圓滑表面加上安全無毒材質，配合細緻可愛的外形設計，讓它成為兼具實用性與趣味感的小巧陪伴玩具，也很適合作為日常小禮物或回禮之選。\n\n🥑 Press, twist and fidget your way to calm and focus.\n\n#Hape #EurekakidsHK #AvocadoFidget #牛油果減壓手感玩具 #SensoryPlay #FidgetToy #FineMotorSkills #FocusPlay #CalmAndLearn #LearningThroughPlay` },
+  { title:'Avocado Fidget',
+    copy:`Hape Avocado Fidget｜牛油果減壓手感玩具\n\n按一按、轉一轉、摸一摸，把放鬆感與專注力輕輕握在手心之中。\n\n這款可愛牛油果造型的手感減壓玩具，以小巧輕便設計結合木質中心結構，讓孩子在按壓、轉動與反覆觸摸的過程中，享受穩定情緒與放鬆感官的互動體驗。無論在家中、課堂上，還是外出等候時，都能隨手拿起，陪伴孩子自然進入更平靜、更專注的狀態。\n\n透過簡單重複的手部操作，孩子不但可逐步提升專注力與手眼協調能力，亦有助發展精細動作與感官調節能力。圓滑表面加上安全無毒材質，配合細緻可愛的外形設計，讓它成為兼具實用性與趣味感的小巧陪伴玩具，也很適合作為日常小禮物或回禮之選。\n\n🥑 Press, twist and fidget your way to calm and focus.\n\n#Hape #EurekakidsHK #AvocadoFidget #牛油果減壓手感玩具 #SensoryPlay #FidgetToy #FineMotorSkills #FocusPlay #CalmAndLearn #LearningThroughPlay` },
   { title:'4-in-1 Learning Tricycle',
-    copy:`4-in-1 Learning Tricycle｜Hape 4-in-1 學習三輪車\n\n推一推、踩一踩、滑一滑，陪孩子由第一程出發，慢慢騎出平衡感、自信心與成長節奏。\n\n這款 Hape 4-in-1 學習三輪車結合四種成長模式，從推行三輪車、學步車、踩踏三輪車到平衡車，按孩子不同發展階段靈活轉換，讓每一次騎行都成為探索身體協調與方向控制的學習體驗。\n\n車身設計輕巧便攜，僅重 4.2 公斤，配合三段可調推把、可調座高、避震 EVA 車輪、防滑踏板及舒適握把，讓家長推行更輕鬆，孩子騎乘更安心。透過反覆練習踩踏、轉向與平衡，不但有助促進大肌肉發展與手眼協調，亦能逐步提升孩子的自信心與身體控制能力，是一款可陪伴 18 個月以上孩子持續成長的長期騎乘玩具。\n\n🚲 Push, ride and balance into every growing milestone.\n\n#Hape #EurekakidsHK #4in1LearningTricycle #學習三輪車 #成長型三輪車 #平衡車 #GrossMotorSkills #BalanceDevelopment #OutdoorPlay #LearningThroughPlay` },
+    copy:`4-in-1 Learning Tricycle｜Hape 4-in-1 學習三輪車\n\n推一推、踩一踩、滑一滑，陪孩子由第一程出發，慢慢騎出平衡感、自信心與成長節奏。\n\n這款 Hape 4-in-1 學習三輪車結合四種成長模式，從推行三輪車、學步車、踩踏三輪車到平衡車，按孩子不同發展階段靈活轉換，讓每一次騎行都成為探索身體協調與方向控制的學習體驗。無論在日常散步、戶外放電，還是親子出遊時使用，都能陪伴孩子一步步建立更穩定的騎乘能力。\n\n車身設計輕巧便攜，僅重 4.2 公斤，配合三段可調推把、可調座高、避震 EVA 車輪、防滑踏板及舒適握把，讓家長推行更輕鬆，孩子騎乘更安心。透過反覆練習踩踏、轉向與平衡，不但有助促進大肌肉發展與手眼協調，亦能逐步提升孩子的自信心與身體控制能力，是一款可陪伴 18 個月以上孩子持續成長的長期騎乘玩具。\n\n🚲 Push, ride and balance into every growing milestone.\n\n#Hape #EurekakidsHK #4in1LearningTricycle #學習三輪車 #成長型三輪車 #平衡車 #GrossMotorSkills #BalanceDevelopment #OutdoorPlay #LearningThroughPlay` },
   { title:'5-Piece Band Set',
-    copy:`5‑Piece Band Set｜Hape 樂隊組合五件套裝\n\n敲一敲、拍一拍、一起合奏，讓孩子在節奏與互動之中，自然打開音樂表達的小宇宙。\n\n這款 Hape 樂隊組合五件套裝以多件樂器組合與合奏互動為核心設計，包含五件不同音色的樂器構件，讓孩子可透過輪流演奏、互相配合與一起合奏，感受節奏層次與聲音變化帶來的樂趣。\n\n透過反覆敲擊、聆聽與節奏練習，孩子不但能逐步建立對聲音與節拍的基本理解，亦有助培養專注力、手部協調及團隊互動能力。套裝結合木質、塑料構件與金屬音片，配合安全塗層處理，兼具耐用性與遊玩安心感，是一款適合啟發音樂感知、節奏感與表達能力的互動式音樂玩具。\n\n🎵 Play, listen and grow through the joy of making music together.\n\n#Hape #EurekakidsHK #5PieceBandSet #樂隊組合五件套裝 #MusicPlay #MusicalToy #RhythmAndPlay #CreativeExpression #TeamPlay #LearningThroughPlay` }
+    copy:`5‑Piece Band Set｜Hape 樂隊組合五件套裝\n\n敲一敲、拍一拍、一起合奏，讓孩子在節奏與互動之中，自然打開音樂表達的小宇宙。\n\n這款 Hape 樂隊組合五件套裝以多件樂器組合與合奏互動為核心設計，包含五件不同音色的樂器構件，讓孩子可透過輪流演奏、互相配合與一起合奏，感受節奏層次與聲音變化帶來的樂趣。無論在家中親子互動、朋友同樂，還是小組音樂活動中使用，都能讓孩子在輕鬆愉快的氣氛下投入音樂探索。\n\n透過反覆敲擊、聆聽與節奏練習，孩子不但能逐步建立對聲音與節拍的基本理解，亦有助培養專注力、手部協調及團隊互動能力。套裝結合木質、塑料構件與金屬音片，配合安全塗層處理，兼具耐用性與遊玩安心感，是一款適合啟發音樂感知、節奏感與表達能力的互動式音樂玩具。\n\n🎵 Play, listen and grow through the joy of making music together.\n\n#Hape #EurekakidsHK #5PieceBandSet #樂隊組合五件套裝 #MusicPlay #MusicalToy #RhythmAndPlay #CreativeExpression #TeamPlay #LearningThroughPlay` }
 ];
 
 // =============================================
@@ -84,7 +84,8 @@ const HASHTAG_RULES = [
   ['感官|sensory','#SensoryPlay','#EarlyLearning'],
   ['積木|block|abc','#BuildingBlocks','#EarlyLearning'],
   ['火車|train|tunnel|railway|鐵道','#TrainPlay','#WoodenTrain'],
-  ['廚房|kitchen|food|食物|扮家家','#PretendPlay','#KitchenPlay'],
+  ['廚房|kitchen|food|食物|扮家家|pretend','#PretendPlay','#KitchenPlay'],
+  ['購物|basket|shopping','#PretendPlay','#LanguageDevelopment'],
   ['娃娃屋|dollhouse|doll','#DollHouse','#PretendPlay'],
   ['三輪車|tricycle|balance|ride','#OutdoorPlay','#GrossMotorSkills','#BalanceDevelopment'],
   ['拼圖|puzzle','#PuzzlePlay','#CognitiveDevelopment'],
@@ -103,14 +104,24 @@ const HASHTAG_RULES = [
 // =============================================
 // 工具函數
 // =============================================
+
+// 修復①：先移除 <style> 區塊再 stripHtml
 function stripHtml(html) {
+  const cleaned = (html || '')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
   const d = document.createElement('div');
-  d.innerHTML = html || '';
+  d.innerHTML = cleaned;
   return d.textContent || d.innerText || '';
 }
 
+// 修復③：過濾含 { } 的 CSS 殘留
 function getSentences(text) {
-  return text.replace(/\s+/g,' ').split(/(?<=[。！？\.!?])\s*/).map(s=>s.trim().replace(/[。！？\.!?]+$/,'')).filter(s=>s.length>4);
+  return text
+    .replace(/\s+/g, ' ')
+    .split(/(?<=[。！？\.!?])\s*/)
+    .map(s => s.trim().replace(/[。！？\.!?]+$/, ''))
+    .filter(s => s.length > 4 && !s.includes('{') && !s.includes('}') && !s.includes(':'));
 }
 
 function getEmoji(text) {
@@ -122,16 +133,16 @@ function getEmoji(text) {
 }
 
 function getHashtags(title, desc, vendor) {
-  const t = (title+' '+desc+' '+vendor).toLowerCase();
-  const tags = new Set(['#Hape','#HapeHK','#LearningThroughPlay','#CreativePlay']);
+  const t = (title + ' ' + desc + ' ' + vendor).toLowerCase();
+  const tags = new Set(['#Hape', '#HapeHK', '#LearningThroughPlay', '#CreativePlay']);
   HASHTAG_RULES.forEach(([keys, ...htags]) => {
     if (keys.split('|').some(k => t.includes(k.toLowerCase()))) htags.forEach(h => tags.add(h));
   });
-  return Array.from(tags).slice(0,10).join(' ');
+  return Array.from(tags).slice(0, 10).join(' ');
 }
 
 function fmt(price) {
-  return parseFloat(price).toFixed(2).replace(/\.00$/,'');
+  return parseFloat(price).toFixed(2).replace(/\.00$/, '');
 }
 
 // =============================================
@@ -139,16 +150,24 @@ function fmt(price) {
 // =============================================
 function genA(p, url) {
   const desc = getSentences(stripHtml(p.body_html));
-  const para1 = desc.slice(0,2).join('。') + (desc.slice(0,2).length ? '。' : '');
-  const para2 = desc.slice(2,4).join('。') + (desc.slice(2,4).length ? '。' : '');
+
+  // 修復②：hook 只取英文部分（｜前）
+  const shortTitle = p.title.split('｜')[0].trim();
+  const hook = `探一探、玩一玩、學一學，${shortTitle} 陪孩子開始每一次探索。`;
+
+  // 修復④：多取句子，para1 = 前3句，para2 = 接後3句
+  const para1 = desc.slice(0, 3).join('。') + (desc.slice(0, 3).length ? '。' : '');
+  const para2 = desc.slice(3, 6).join('。') + (desc.slice(3, 6).length ? '。' : '');
+
   const emoji = getEmoji(p.title + para1);
   const tags = getHashtags(p.title, para1 + para2, p.vendor);
-  const hook = `探一探、玩一玩、學一學，${p.title} 陪孩子開始每一次探索。`;
   const tagline = `${emoji} Explore, play and grow through joyful discovery.`;
+
   const parts = [`Hape｜${p.title}`, hook];
-  if (para1) parts.push(para1);
-  if (para2) parts.push(para2);
+  if (para1.length > 2) parts.push(para1);
+  if (para2.length > 2) parts.push(para2);
   parts.push(tagline, `🔗 ${url}`, tags);
+
   return parts.join('\n\n');
 }
 
@@ -161,9 +180,10 @@ document.getElementById('genBtn').addEventListener('click', async () => {
   if (!raw.includes('hapehk.com')) return setStatus('請貼入 Hape HK 產品連結', 'error');
   if (!raw.includes('/products/')) return setStatus('連結需包含 /products/', 'error');
 
-  const cleanUrl = raw.replace(/\?.*$/,'').replace(/\/$/,'');
-  // 移除 locale prefix 以取得正確 JSON endpoint
-  const jsonUrl = cleanUrl.replace(/\/[a-z]{2}-[a-z]{4}\/products\//i, '/products/') + '.json';
+  const cleanUrl = raw.replace(/\?.*$/, '').replace(/\/$/, '');
+
+  // 移除 locale prefix（/zh-hant/ 等）以取得正確 JSON endpoint
+  const jsonUrl = cleanUrl.replace(/\/[a-z]{2}-[a-z]{4}(\/products\/)/, '$1') + '.json';
 
   setStatus('正在抓取資料…', '');
   document.getElementById('genBtn').disabled = true;
@@ -198,7 +218,7 @@ document.getElementById('copyBtn').addEventListener('click', () => {
 function setStatus(msg, type) {
   const el = document.getElementById('status');
   el.textContent = msg;
-  el.className = 'status' + (type ? ' '+type : '');
+  el.className = 'status' + (type ? ' ' + type : '');
 }
 </script>
 </body>
