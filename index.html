@@ -3,273 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Eurekakids HK IG 文案生成器</title>
+  <title>IG 文案生成器</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f4f8; color: #333; min-height: 100vh; }
-    .container { max-width: 600px; margin: 0 auto; padding: 28px 16px; }
-    h1 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #111; }
-    .card { background: white; border-radius: 14px; padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-    label { display: block; font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    input[type="text"] { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; outline: none; transition: border-color 0.2s; color: #333; }
-    input[type="text"]:focus { border-color: #f59e0b; }
-    .gen-btn { width: 100%; padding: 13px; background: #f59e0b; color: white; border: none; border-radius: 9px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-    .gen-btn:hover { background: #d97706; }
-    .gen-btn:disabled { background: #fcd34d; cursor: not-allowed; }
-    .status { font-size: 13px; text-align: center; min-height: 18px; margin-top: 10px; color: #888; }
-    .status.error { color: #ef4444; }
-    .status.success { color: #10b981; }
-    .preview-box { margin-top: 12px; background: #fffbeb; border-radius: 8px; padding: 10px 13px; font-size: 13px; color: #555; display: none; }
-    .preview-box.show { display: block; }
-    .preview-box strong { color: #333; }
-    textarea { width: 100%; min-height: 340px; padding: 13px; border: 1.5px solid #e5e5e5; border-radius: 9px; font-size: 14px; line-height: 1.75; resize: vertical; font-family: inherit; outline: none; color: #333; }
-    .copy-btn { width: 100%; padding: 11px; background: #10b981; color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
-    .copy-btn:hover { background: #059669; }
-    #outputCard { display: none; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f4f8; min-height: 100vh; }
+
+    .tab-bar {
+      display: flex; gap: 0;
+      background: white;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .tab-btn {
+      flex: 1; padding: 14px 8px;
+      border: none; background: white;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; color: #aaa;
+      border-bottom: 3px solid transparent;
+      transition: all 0.18s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .tab-btn:hover { color: #555; }
+    .tab-btn.active { color: #111; }
+    .tab-btn.hape.active  { border-color: #6366f1; color: #6366f1; }
+    .tab-btn.ek.active    { border-color: #f59e0b; color: #f59e0b; }
+    .tab-btn.ric.active   { border-color: #10b981; color: #10b981; }
+
+    .frame-wrap { display: none; width: 100%; height: calc(100vh - 49px); }
+    .frame-wrap.active { display: block; }
+    iframe { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>✨ Eurekakids HK IG 文案生成器</h1>
 
-  <div class="card">
-    <label>產品連結</label>
-    <input type="text" id="urlInput" placeholder="https://eurekakids.com.hk/collections/.../products/..." />
-    <div class="preview-box" id="previewBox"></div>
+  <div class="tab-bar">
+    <button class="tab-btn hape active" onclick="show('hape', this)">🧸 Hape HK</button>
+    <button class="tab-btn ek"          onclick="show('ek', this)">✨ Eurekakids HK</button>
+    <button class="tab-btn ric"         onclick="show('ric', this)">🛍️ RicOutlet</button>
   </div>
 
-  <div class="card">
-    <button class="gen-btn" id="genBtn">生成文案</button>
-    <div class="status" id="status"></div>
+  <div class="frame-wrap active" id="frame-hape">
+    <iframe src="hapehk.html" loading="lazy"></iframe>
+  </div>
+  <div class="frame-wrap" id="frame-ek">
+    <iframe src="eurekakids.html" loading="lazy"></iframe>
+  </div>
+  <div class="frame-wrap" id="frame-ric">
+    <iframe src="ricoutlet.html" loading="lazy"></iframe>
   </div>
 
-  <div class="card" id="outputCard">
-    <label>生成結果</label>
-    <textarea id="output"></textarea>
-    <button class="copy-btn" id="copyBtn">📋 複製文案</button>
-  </div>
-</div>
-
-<script>
-// =============================================
-// 文案參考庫
-// =============================================
-const COPY_LIBRARY = [
-  { title: 'Nature Rhythm Band Set',
-    copy: `✨ Hape 自然樂隊節奏套件｜Nature Rhythm Band Set（E0639）\n\n多件敲擊樂器一齊上陣，配合不同音色構件，透過合奏＋輪流演奏玩出節奏層次。\n在一起「拍、聽、接」，孩子自然建立音樂理解同時培養團隊合作能力，也提升溝通互動。\n\n🎶 多件敲擊樂器、手持操作\n🤝 合奏互動與節奏練習\n🧩 木質＋塑料構件，含金屬音片\n\n✅ 安全塗層處理\n✅ 避免強力撞擊／使用後分類收納\n\n💰 HK$269\n🔗 了解更多：https://eurekakids.com.hk/collections/series-sound-music/products/nature-rhythm-band-set-e0639\n\n#EurekakidsHK #Hape #音樂啟蒙 #敲擊樂器 #合奏互動 #團隊合作 #節奏訓練 #親子互動` },
-  { title: 'Curious Tots Box 4',
-    copy: `✨ Curious Tots Box 4｜好奇寶寶發現盒 4\n\n專為 30–36 個月幼兒設計，透過 4 款適齡活動，帶領孩子在「玩」的過程中持續進階：認知、觀察、比較、記憶與表達。\n\n🔎 Weight Scale（重量與比較）\n平衡、比較與測量，探索重量、因果關係與早期 STEM。\n\n📐 Peg Board Ladder（空間與邏輯）\n堆疊、排序與高度比較，建立空間概念、手眼協調與邏輯思維。\n\n🧩 Mystery Bag（觸摸與猜測）\n觸摸、猜測與形狀配對，提升觸覺辨識、觀察力、記憶力與形狀認知。\n\n📚 Storytelling Cards（語言與想像）\n自由聯想、描述畫面、創作故事，培養語言表達、情緒連結與想像力。\n\n✅ 高品質木質部件（圓角打磨）\n✅ 安全無毒水性塗料\n✅ 耐用塑膠操作元件\n\n👶 適合：30–36 個月\n\n💰 HK$399\n🔗 了解更多：https://eurekakids.com.hk/collections/new-items/products/curious-tots-box-4\n\n#EurekakidsHK #CuriousTots #蒙特梭利 #認知探索 #幼兒玩具 #早教 #STEM #親子互動 #學習玩具` },
-  { title: 'Honey Radiant Light Advanced Set 24pcs',
-    copy: `✨ Honey 24件｜璀璨光明進階版\n3D 磁性積木 STEM 建構套裝\n\n溫暖金黃色調，結合幾何結構與藝術美感，打造屬於孩子的立體創作世界。\n\n24 件進階組合，在入門與高階之間取得平衡，讓建構更有層次與挑戰性。\n\n🧲 所有面均可磁性連接\n🧠 建立空間概念與比例理解\n📐 培養邏輯推理與結構思維\n✋ 提升手眼協調與精細動作\n🎨 結合藝術創作與 STEAM 學習\n\n✅ 無毒材質\n✅ 通過 CE 安全認證\n✅ 圓角安全設計\n\n適合 3 歲以上。\n\n💰 HK$769\n🔗 了解更多：https://eurekakids.com.hk/collections/brands-trido/products/honey-radiant-light-advanced-set-24pcs\n\n#EurekakidsHK #Trido #磁性積木 #STEM玩具 #空間思維 #創意建構` }
-];
-
-// =============================================
-// 設定
-// =============================================
-const EMOJI_MAP = [
-  ['音樂|musical|music|band|drum|rhythm|節奏', '🎵'],
-  ['熊貓|panda', '🐼'], ['兔|bunny|rabbit', '🐰'],
-  ['火車|train|tunnel|railway|鐵道', '🚂'],
-  ['廚房|kitchen|food|食物', '🍳'],
-  ['磁性|magnetic|magnet', '🧲'],
-  ['積木|block|build|建構', '🧱'],
-  ['感官|sensory|texture|multitexture', '✨'],
-  ['三輪車|tricycle|ride|bike|balance', '🚲'],
-  ['沙|sand', '🏖️'],
-  ['探索|explorer|discover|curious', '🔍'],
-  ['公仔|plush|絨|毛|安撫', '🧸'],
-  ['拼圖|puzzle|配對|match', '🧩'],
-  ['桌遊|board|game', '🎲'],
-  ['畫|art|craft|藝術', '🎨'],
-  ['娃娃|doll', '🪆'],
-  ['嬰兒|baby|infant|新生', '👶'],
-  ['空間|spatial|3d|立體', '📐'],
-  ['數|math|number|數感', '🔢'],
-];
-
-const HASHTAG_RULES = [
-  ['音樂|musical|music|band|drum|rhythm|節奏', '#音樂啟蒙', '#節奏訓練'],
-  ['感官|sensory|texture|multitexture|觸感', '#感官發展', '#SensoryPlay'],
-  ['磁性|magnetic|magnet', '#磁性積木', '#STEM玩具'],
-  ['積木|block|build|建構', '#創意建構'],
-  ['montessori|蒙特梭利', '#蒙特梭利', '#早教'],
-  ['stem|steam', '#STEM'],
-  ['火車|train|railway|鐵道', '#木製火車', '#軌道玩具'],
-  ['廚房|kitchen|food|食物|扮家家|pretend', '#角色扮演', '#扮家家酒'],
-  ['娃娃|doll|plush|毛|絨|安撫', '#安撫玩具'],
-  ['三輪車|tricycle|balance|ride|bike|戶外', '#戶外玩具', '#動作發展'],
-  ['拼圖|puzzle|配對|match', '#益智玩具', '#認知發展'],
-  ['桌遊|board|game', '#桌遊推薦', '#策略思維'],
-  ['art|craft|藝術|畫|creative', '#藝術啟蒙', '#創意表達'],
-  ['語言|language|abc|letter|words', '#語言發展'],
-  ['精細|fine motor|抓握|grip', '#精細動作'],
-  ['大肌肉|gross motor', '#大肌肉發展'],
-  ['嬰|infant|baby|新生', '#嬰幼兒玩具', '#早教'],
-  ['探索|explore|discover|curious', '#認知探索', '#學習玩具'],
-  ['團隊|social|合奏', '#團隊合作'],
-  ['空間|spatial|3d|立體', '#空間思維'],
-  ['邏輯|logic|thinking|推理', '#邏輯思維'],
-];
-
-// =============================================
-// 工具函數
-// =============================================
-function stripHtml(html) {
-  const cleaned = (html || '')
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
-  const d = document.createElement('div');
-  d.innerHTML = cleaned;
-  return d.textContent || d.innerText || '';
-}
-
-function getListItems(html) {
-  const cleaned = (html || '')
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-  const d = document.createElement('div');
-  d.innerHTML = cleaned;
-  return Array.from(d.querySelectorAll('li'))
-    .map(li => li.textContent.trim())
-    .filter(s => s.length > 3 && !s.includes('{'));
-}
-
-function getSentences(text) {
-  return text
-    .replace(/\s+/g, ' ')
-    .split(/(?<=[。！？\.!?])\s*/)
-    .map(s => s.trim().replace(/[。！？\.!?]+$/, ''))
-    .filter(s => s.length > 4 && !s.includes('{') && !s.includes('}') && !s.includes(':'));
-}
-
-function getEmoji(text) {
-  const t = text.toLowerCase();
-  for (const [keys, emoji] of EMOJI_MAP) {
-    if (keys.split('|').some(k => t.includes(k))) return emoji;
-  }
-  return '🌟';
-}
-
-function getVendorTag(vendor) {
-  const v = (vendor || '').toLowerCase();
-  if (v.includes('hape')) return '#Hape';
-  if (v.includes('beleduc')) return '#Beleduc';
-  if (v.includes('trido')) return '#Trido';
-  if (v.includes('käthe') || v.includes('kathe')) return '#KätheKruse';
-  if (v.includes('polym')) return '#PolyM';
-  if (v.includes('flower')) return '#FlowerMonaco';
-  if (v.includes('ambosstoys')) return '#Ambosstoys';
-  if (v.includes('eurekakids')) return '#Eurekakids';
-  return '';
-}
-
-function getHashtags(title, desc, vendor) {
-  const t = (title + ' ' + desc + ' ' + vendor).toLowerCase();
-  const tags = new Set(['#EurekakidsHK', '#親子互動']);
-  const vendorTag = getVendorTag(vendor);
-  if (vendorTag) tags.add(vendorTag);
-  HASHTAG_RULES.forEach(([keys, ...htags]) => {
-    if (keys.split('|').some(k => t.includes(k.toLowerCase()))) htags.forEach(h => tags.add(h));
-  });
-  return Array.from(tags).slice(0, 10).join(' ');
-}
-
-function fmt(price) {
-  return parseFloat(price).toFixed(2).replace(/\.00$/, '');
-}
-
-// =============================================
-// 文案生成
-// =============================================
-function genEK(p, url) {
-  const desc = getSentences(stripHtml(p.body_html));
-  const listItems = getListItems(p.body_html);
-
-  // Title
-  const titleLine = `✨ ${p.title}`;
-
-  // Hook: first 3 sentences as paragraph
-  const hookArr = desc.slice(0, 3);
-  const hook = hookArr.join('。') + (hookArr.length ? '。' : '');
-
-  // Feature bullets: prefer <li> items, fallback to desc sentences 3–6
-  const featureSource = listItems.length >= 3 ? listItems : desc.slice(3, 6);
-  const featureBullets = featureSource.slice(0, 4).map(s => `✨ ${s}`).join('\n');
-
-  // ✅ spec/safety bullets: only when enough list items available
-  const checkSource = listItems.length >= 6 ? listItems.slice(4, 7) : [];
-  const checkBullets = checkSource.map(s => `✅ ${s}`).join('\n');
-
-  // Price
-  const v = p.variants[0];
-  const price = fmt(v.price);
-  const origPrice = v.compare_at_price ? fmt(v.compare_at_price) : null;
-  const priceLine = origPrice
-    ? `💰 原價 HK$${origPrice} → 現售 HK$${price}`
-    : `💰 HK$${price}`;
-
-  // Hashtags
-  const tags = getHashtags(p.title, hook, p.vendor);
-
-  const parts = [titleLine, hook];
-  if (featureBullets) parts.push(featureBullets);
-  if (checkBullets) parts.push(checkBullets);
-  parts.push(priceLine, `🔗 了解更多：${url}`, tags);
-
-  return parts.join('\n\n');
-}
-
-// =============================================
-// UI
-// =============================================
-document.getElementById('genBtn').addEventListener('click', async () => {
-  const raw = document.getElementById('urlInput').value.trim();
-  if (!raw) return setStatus('請貼入產品連結', 'error');
-  if (!raw.includes('eurekakids.com.hk')) return setStatus('請貼入 Eurekakids HK 產品連結', 'error');
-  if (!raw.includes('/products/')) return setStatus('連結需包含 /products/', 'error');
-
-  const cleanUrl = raw.replace(/\?.*\(/, '').replace(/#.*\)/, '').replace(/\/$/, '');
-
-  // 從 /collections/xxx/products/slug 或 /products/slug 提取 slug
-  const productSlug = cleanUrl.split('/products/')[1];
-  const jsonUrl = `https://eurekakids.com.hk/products/${productSlug}.json`;
-
-  setStatus('正在抓取資料…', '');
-  document.getElementById('genBtn').disabled = true;
-
-  try {
-    const res = await fetch(jsonUrl);
-    if (!res.ok) throw new Error();
-    const { product } = await res.json();
-
-    const pb = document.getElementById('previewBox');
-    const price = fmt(product.variants[0].price);
-    const orig = product.variants[0].compare_at_price;
-    pb.innerHTML = `<strong>${product.vendor}</strong> — ${product.title}<br>${orig ? `<s>HK$${fmt(orig)}</s> → ` : ''}HK$${price}`;
-    pb.classList.add('show');
-
-    document.getElementById('output').value = genEK(product, cleanUrl);
-    document.getElementById('outputCard').style.display = 'block';
-    setStatus('✅ 生成完成！', 'success');
-  } catch {
-    setStatus('❌ 無法抓取資料，請確認連結', 'error');
-  } finally {
-    document.getElementById('genBtn').disabled = false;
-  }
-});
-
-document.getElementById('copyBtn').addEventListener('click', () => {
-  navigator.clipboard.writeText(document.getElementById('output').value).then(() => {
-    const b = document.getElementById('copyBtn');
-    b.textContent = '✅ 已複製！';
-    setTimeout(() => b.textContent = '📋 複製文案', 2000);
-  });
-});
-
-function setStatus(msg, type) {
-  const el = document.getElementById('status');
-  el.textContent = msg;
-  el.className = 'status' + (type ? ' ' + type : '');
-}
-</script>
+  <script>
+    function show(id, btn) {
+      document.querySelectorAll('.frame-wrap').forEach(f => f.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('frame-' + id).classList.add('active');
+      btn.classList.add('active');
+    }
+  </script>
 </body>
 </html>
